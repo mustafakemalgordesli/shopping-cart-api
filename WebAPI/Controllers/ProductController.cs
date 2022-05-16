@@ -27,13 +27,13 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            ResponseDataDTO<IEnumerable<ProductGetDTO>> response = await _productService.GetAllAsync();
+            ResponseDataDTO<List<ProductGetDTO>> response = await _productService.GetAllAsync();
             if (response.Success)
                 return Ok(response);
             return BadRequest(response);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetAll(int id)
         {
             ResponseDataDTO<ProductGetDTO> response = await _productService.GetById(id);

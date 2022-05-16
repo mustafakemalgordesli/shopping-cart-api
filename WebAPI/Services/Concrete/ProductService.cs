@@ -26,7 +26,7 @@ namespace WebAPI.Services.Concrete
                 {
                     string FileName = request.File.FileName;
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + FileName;
-                    string imageUrl = "wwwroot/images/" + FileName;
+                    string imageUrl = "wwwroot/images/" + uniqueFileName;
                     var imagePath = Path.Combine(Directory.GetCurrentDirectory(), imageUrl);
                     Product product = _mapper.Map<Product>(request);
                     product.ImageURL = imageUrl;
@@ -46,18 +46,18 @@ namespace WebAPI.Services.Concrete
             }
         }
 
-        public async Task<ResponseDataDTO<IEnumerable<ProductGetDTO>>> GetAllAsync()
+        public async Task<ResponseDataDTO<List<ProductGetDTO>>> GetAllAsync()
         {
             try
             {
                 IEnumerable<Product> products = await _unitOfWork.productDal.GetAllAsync();
-                IEnumerable<ProductGetDTO> data = _mapper.Map<IEnumerable<ProductGetDTO>>(products);
-                return new ResponseDataDTO<IEnumerable<ProductGetDTO>>(true, "products listed", data);
+                List<ProductGetDTO> data = _mapper.Map<List<Product>, List<ProductGetDTO>>(products.ToList());
+                return new ResponseDataDTO<List<ProductGetDTO>>(true, "products listed", data);
 
             }
             catch (Exception)
             {
-                return new ResponseDataDTO<IEnumerable<ProductGetDTO>>(false, "products not listed");
+                return new ResponseDataDTO<List<ProductGetDTO>>(false, "products not listed");
             }
         }
 

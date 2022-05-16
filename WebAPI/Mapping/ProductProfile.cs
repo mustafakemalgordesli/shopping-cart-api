@@ -10,7 +10,6 @@ namespace WebAPI.Mapping
         {
             CreateMap<Product, ProductGetDTO>();
             CreateMap<ProductCreateDTO, Product>();
-            CreateMap<IEnumerable<Product>, IEnumerable<ProductGetDTO>>();
         }
     }
 }
