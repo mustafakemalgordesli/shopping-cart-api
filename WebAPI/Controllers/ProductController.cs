@@ -24,6 +24,7 @@ namespace WebAPI.Controllers
             return BadRequest(response);
         }
 
+        [ResponseCache(Duration = 10)]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -34,9 +35,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAll(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            ResponseDataDTO<ProductGetDTO> response = await _productService.GetById(id);
+            ResponseDataDTO<ProductGetDTO> response = await _productService.GetByIdAsync(id);
             if (response.Success)
                 return Ok(response);
             return BadRequest(response);
@@ -45,7 +46,7 @@ namespace WebAPI.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            ResponseDTO response = await _productService.Remove(id);
+            ResponseDTO response = await _productService.RemoveAsync(id);
             if (response.Success)
                 return Ok(response);
             return BadRequest(response);

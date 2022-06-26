@@ -61,7 +61,7 @@ namespace WebAPI.Services.Concrete
             }
         }
 
-        public async Task<ResponseDataDTO<ProductGetDTO>> GetById(int id)
+        public async Task<ResponseDataDTO<ProductGetDTO>> GetByIdAsync(int id)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace WebAPI.Services.Concrete
             }
         }
 
-        public async Task<ResponseDTO> Remove(int id)
+        public async Task<ResponseDTO> RemoveAsync(int id)
         {
             try
             {

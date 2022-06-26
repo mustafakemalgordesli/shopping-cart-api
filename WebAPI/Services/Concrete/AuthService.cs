@@ -75,9 +75,13 @@ public class AuthService : IAuthService
                 };
                 await _unitOfWork.userDal.AddAsync(user);
                 await _unitOfWork.CommitAsync();
-                User savedUser = await _unitOfWork.userDal.SingleOrDefaultAsync(u => u.Email == user.Email);
-                string token = CreateToken(savedUser);
-                UserDTO userDTO = _mapper.Map<UserDTO>(savedUser);
+                await _unitOfWork.cartDal.AddAsync(new Cart()
+                {
+                    UserId = user.Id
+                });
+                await _unitOfWork.CommitAsync();
+                string token = CreateToken(user);
+                UserDTO userDTO = _mapper.Map<UserDTO>(user);
                 AuthDTO response = new AuthDTO(true, "user registration successfully created", token, userDTO);
                 return response;
             }
