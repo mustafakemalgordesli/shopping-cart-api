@@ -5,7 +5,7 @@ namespace WebAPI.Services.Abstract;
 
 public interface ICategoryService
 {
-    Task<ResponseDTO> AddAsync(CategoryDTO request);
+    Task<ResponseDataDTO<Category>> AddAsync(CategoryDTO request);
     Task<ResponseDTO> UpdateAsync(int id, CategoryDTO request);
     Task<ResponseDTO> RemoveAsync(int id);
     Task<ResponseDataDTO<Category>> GetByIdAsync(int id);

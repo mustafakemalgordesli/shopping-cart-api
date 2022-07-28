@@ -27,6 +27,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("id")]
+        [ResponseCache(Duration = 10)]
         public async Task<IActionResult> GetById(int id)
         {
             ResponseDataDTO<Category> response = await _categoryService.GetByIdAsync(id);
@@ -36,6 +37,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(Name = "GetAll")]
+        [ResponseCache(Duration = 10)]
         public async Task<IActionResult> GetAll()
         {
             ResponseDataDTO<IEnumerable<Category>> response = await _categoryService.GetAllAsync();

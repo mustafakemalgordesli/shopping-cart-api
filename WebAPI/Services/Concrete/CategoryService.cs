@@ -18,7 +18,7 @@ public class CategoryService : ICategoryService
         _mapper = mapper;
     }
 
-    public async Task<ResponseDTO> AddAsync(CategoryDTO request)
+    public async Task<ResponseDataDTO<Category>> AddAsync(CategoryDTO request)
     {
         try
         {
@@ -29,16 +29,16 @@ public class CategoryService : ICategoryService
             {
                 await _unitOfWork.categoryDal.AddAsync(category);
                 await _unitOfWork.CommitAsync();
-                return new ResponseDTO(true, "category added");
+                return new ResponseDataDTO<Category>(true, "category added", category);
             }
             else
             {
-                return new ResponseDTO(false, result.Errors.ToString());
+                return new ResponseDataDTO<Category>(false, result.Errors.ToString());
             }
         }
         catch (Exception e)
         {
-            return new ResponseDTO(false, "category not added");
+            return new ResponseDataDTO<Category>(false, "category not added");
         }
     }
 
