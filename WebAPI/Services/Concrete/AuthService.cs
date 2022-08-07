@@ -28,26 +28,32 @@ public class AuthService : IAuthService
     {
         try
         {
-            User user = await _unitOfWork.userDal.SingleOrDefaultAsync(u => u.Email == request.Email);
-            if(user != null)
+            LoginDtoValidator validator = new LoginDtoValidator();
+            ValidationResult result = validator.Validate(request);
+            if(result.IsValid)
             {
-                if(VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+                User user = await _unitOfWork.userDal.SingleOrDefaultAsync(u => u.Email == request.Email);
+                if (user != null)
                 {
-                    string token = CreateToken(user);
-                    UserDTO userDTO = _mapper.Map<UserDTO>(user);
-                    AuthDTO response = new AuthDTO(true, "auth successfull", token, userDTO);
-                    return response;
+                    if (VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+                    {
+                        string token = CreateToken(user);
+                        UserDTO userDTO = _mapper.Map<UserDTO>(user);
+                        AuthDTO response = new AuthDTO(true, "auth successfull", token, userDTO);
+                        return response;
+                    }
+                    else
+                    {
+                        return new AuthDTO(false, "auth failed");
+                    }
                 }
                 else
                 {
                     return new AuthDTO(false, "auth failed");
                 }
             }
-            else
-            {
-                return new AuthDTO(false, "auth failed");
-            }
-   
+            return new AuthDTO(false, "auth failed");
+
         }
         catch (Exception)
         {
@@ -85,10 +91,7 @@ public class AuthService : IAuthService
                 AuthDTO response = new AuthDTO(true, "user registration successfully created", token, userDTO);
                 return response;
             }
-            else
-            {
-                return new AuthDTO(false, "failed to create user registration");
-            }
+            return new AuthDTO(false, "failed to create user registration");
         }
         catch (Exception)
         {

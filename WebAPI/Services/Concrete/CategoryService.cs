@@ -31,10 +31,7 @@ public class CategoryService : ICategoryService
                 await _unitOfWork.CommitAsync();
                 return new ResponseDataDTO<Category>(true, "category added", category);
             }
-            else
-            {
-                return new ResponseDataDTO<Category>(false, result.Errors.ToString());
-            }
+            return new ResponseDataDTO<Category>(false, result.Errors.ToString());
         }
         catch (Exception e)
         {

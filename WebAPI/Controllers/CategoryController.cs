@@ -20,7 +20,7 @@ namespace WebAPI.Controllers
         [HttpPost, Authorize(Roles = "Admin")]
         public async Task<IActionResult> Add(CategoryDTO request)
         {
-            ResponseDTO response = await _categoryService.AddAsync(request);
+            ResponseDataDTO<Category> response = await _categoryService.AddAsync(request);
             if (response.Success)
                 return Ok(response);
             return BadRequest(response);

@@ -17,7 +17,7 @@ namespace WebAPI.Services.Concrete
             _mapper = mapper;
             _categoryService = categoryService;
         }
-        public async Task<ResponseDTO> AddAsync(ProductCreateDTO request)
+        public async Task<ResponseDataDTO<ProductGetDTO>> AddAsync(ProductCreateDTO request)
         {
             try
             {
@@ -33,16 +33,17 @@ namespace WebAPI.Services.Concrete
                     await _unitOfWork.productDal.AddAsync(product);
                     request.File.CopyTo(new FileStream(imagePath, FileMode.Create));
                     await _unitOfWork.CommitAsync();
-                    return new ResponseDTO(true, "product added");
+                    ProductGetDTO returnedData = _mapper.Map<ProductGetDTO>(product);
+                    return new ResponseDataDTO<ProductGetDTO>(true, "product added", returnedData);
                 }
                 else
                 {
-                    return new ResponseDTO(false, "product not added");
+                    return new ResponseDataDTO<ProductGetDTO>(false, "product not added");
                 }
             }
             catch (Exception)
             {
-                return new ResponseDTO(false, "product not added");
+                return new ResponseDataDTO<ProductGetDTO>(false, "product not added");
             }
         }
 

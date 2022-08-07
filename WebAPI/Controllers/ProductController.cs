@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] ProductCreateDTO request)
         {
-            ResponseDTO response = await _productService.AddAsync(request);
+            ResponseDataDTO<ProductGetDTO> response = await _productService.AddAsync(request);
             if (response.Success)
                 return Ok(response);
             return BadRequest(response);
