@@ -16,6 +16,11 @@ public class ResponseDataDTO<T> : ResponseDTO
         this.Data = Data;
     }
 
+    public ResponseDataDTO(bool Success, T Data) : base(Success)
+    {
+        this.Data = Data;
+    }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public T? Data { get; set; }
 }
