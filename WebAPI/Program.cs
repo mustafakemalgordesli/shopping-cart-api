@@ -7,6 +7,7 @@ using System.Text;
 using WebAPI.Data;
 using WebAPI.Data.Abstract;
 using WebAPI.Data.Concrete;
+using WebAPI.Extensions;
 using WebAPI.Services.Abstract;
 using WebAPI.Services.Concrete;
 
@@ -74,6 +75,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.ConfigureExceptionHandler();
 
 app.UseResponseCaching();
 
