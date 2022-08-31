@@ -15,16 +15,9 @@ namespace WebAPI.Services.Concrete
 
         public async Task<ResponseDataDTO<Cart>> GetByUserId(int id)
         {
-            try
-            {
-                var cart = await _unitOfWork.cartDal.GetByUserId(id);
-                if (cart == null) return new ResponseDataDTO<Cart>(false, "Cart is not found");
-                return new ResponseDataDTO<Cart>(true, cart);
-            }
-            catch (Exception)
-            {
-                return new ResponseDataDTO<Cart>(false, "Cart is not brought");
-            }
+            var cart = await _unitOfWork.cartDal.GetByUserId(id);
+            if (cart == null) return new ResponseDataDTO<Cart>(false, "Cart is not found");
+            return new ResponseDataDTO<Cart>(true, cart);
         }
     }
 }

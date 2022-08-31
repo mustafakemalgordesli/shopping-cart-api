@@ -19,29 +19,22 @@ namespace WebAPI.Services.Concrete
         }
         public async Task<ResponseDataDTO<ProductGetDTO>> AddAsync(ProductCreateDTO request)
         {
-            try
+            ResponseDataDTO<Category> resultCategory = await _categoryService.GetByIdAsync(request.CategoryId);
+            if (resultCategory.Success)
             {
-                ResponseDataDTO<Category> resultCategory = await _categoryService.GetByIdAsync(request.CategoryId);
-                if (resultCategory.Success)
-                {
-                    string FileName = request.File.FileName;
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + FileName;
-                    string imageUrl = "wwwroot/images/" + uniqueFileName;
-                    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), imageUrl);
-                    Product product = _mapper.Map<Product>(request);
-                    product.ImageURL = imageUrl;
-                    await _unitOfWork.productDal.AddAsync(product);
-                    request.File.CopyTo(new FileStream(imagePath, FileMode.Create));
-                    await _unitOfWork.CommitAsync();
-                    ProductGetDTO returnedData = _mapper.Map<ProductGetDTO>(product);
-                    return new ResponseDataDTO<ProductGetDTO>(true, "product added", returnedData);
-                }
-                else
-                {
-                    return new ResponseDataDTO<ProductGetDTO>(false, "product not added");
-                }
+                string FileName = request.File.FileName;
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + FileName;
+                string imageUrl = "images/" + uniqueFileName;
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), imageUrl);
+                Product product = _mapper.Map<Product>(request);
+                product.ImageURL = imageUrl;
+                await _unitOfWork.productDal.AddAsync(product);
+                request.File.CopyTo(new FileStream(imagePath, FileMode.Create));
+                await _unitOfWork.CommitAsync();
+                ProductGetDTO returnedData = _mapper.Map<ProductGetDTO>(product);
+                return new ResponseDataDTO<ProductGetDTO>(true, "product added", returnedData);
             }
-            catch (Exception)
+            else
             {
                 return new ResponseDataDTO<ProductGetDTO>(false, "product not added");
             }
@@ -49,55 +42,31 @@ namespace WebAPI.Services.Concrete
 
         public async Task<ResponseDataDTO<List<ProductGetDTO>>> GetAllAsync()
         {
-            try
-            {
-                IEnumerable<Product> products = await _unitOfWork.productDal.GetAllAsync();
-                List<ProductGetDTO> data = _mapper.Map<List<Product>, List<ProductGetDTO>>(products.ToList());
-                return new ResponseDataDTO<List<ProductGetDTO>>(true, "products listed", data);
-
-            }
-            catch (Exception)
-            {
-                return new ResponseDataDTO<List<ProductGetDTO>>(false, "products not listed");
-            }
+             IEnumerable<Product> products = await _unitOfWork.productDal.GetAllAsync();
+             List<ProductGetDTO> data = _mapper.Map<List<Product>, List<ProductGetDTO>>(products.ToList());
+             return new ResponseDataDTO<List<ProductGetDTO>>(true, "products listed", data);   
         }
 
         public async Task<ResponseDataDTO<ProductGetDTO>> GetByIdAsync(int id)
         {
-            try
+            Product product = await _unitOfWork.productDal.GetByIdAsync(id);
+            if (product != null)
             {
-                Product product = await _unitOfWork.productDal.GetByIdAsync(id);
-                if(product != null)
-                {
-                    ProductGetDTO data = _mapper.Map<ProductGetDTO>(product);
-                    return new ResponseDataDTO<ProductGetDTO>(true, "product brought", data);
-                }
-                return new ResponseDataDTO<ProductGetDTO>(false, "product not found");
-
+                ProductGetDTO data = _mapper.Map<ProductGetDTO>(product);
+                return new ResponseDataDTO<ProductGetDTO>(true, "product brought", data);
             }
-            catch (Exception)
-            {
-                return new ResponseDataDTO<ProductGetDTO>(false, "product not brought");
-            }
+            return new ResponseDataDTO<ProductGetDTO>(false, "product not found");
         }
 
         public async Task<ResponseDTO> RemoveAsync(int id)
         {
-            try
+            Product product = await _unitOfWork.productDal.GetByIdAsync(id);
+            if (product != null)
             {
-                Product product = await _unitOfWork.productDal.GetByIdAsync(id);
-                if (product != null)
-                {
-                    _unitOfWork.productDal.Remove(product);
-                    return new ResponseDTO(true, "product deleted");
-                }
-                return new ResponseDTO(false, "product not found");
-
+                _unitOfWork.productDal.Remove(product);
+                return new ResponseDTO(true, "product deleted");
             }
-            catch (Exception)
-            {
-                return new ResponseDTO(false, "product not deleted");
-            }
+            return new ResponseDTO(false, "product not found");
         }
     }
 }
