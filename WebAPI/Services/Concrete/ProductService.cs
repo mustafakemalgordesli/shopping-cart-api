@@ -2,6 +2,7 @@
 using WebAPI.Data.Abstract;
 using WebAPI.DTOs;
 using WebAPI.Entities;
+using WebAPI.Exceptions;
 using WebAPI.Services.Abstract;
 
 namespace WebAPI.Services.Concrete
@@ -55,7 +56,7 @@ namespace WebAPI.Services.Concrete
                 ProductGetDTO data = _mapper.Map<ProductGetDTO>(product);
                 return new ResponseDataDTO<ProductGetDTO>(true, "product brought", data);
             }
-            return new ResponseDataDTO<ProductGetDTO>(false, "product not found");
+            throw new NotFoundException("product not found");
         }
 
         public async Task<ResponseDTO> RemoveAsync(int id)
@@ -66,7 +67,7 @@ namespace WebAPI.Services.Concrete
                 _unitOfWork.productDal.Remove(product);
                 return new ResponseDTO(true, "product deleted");
             }
-            return new ResponseDTO(false, "product not found");
+            throw new NotFoundException("product not found");
         }
     }
 }

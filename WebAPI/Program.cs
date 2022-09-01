@@ -4,12 +4,14 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using WebAPI.ActionFilters;
 using WebAPI.Data;
 using WebAPI.Data.Abstract;
 using WebAPI.Data.Concrete;
 using WebAPI.Extensions;
 using WebAPI.Services.Abstract;
 using WebAPI.Services.Concrete;
+using WebAPI.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IJwtUtils, JwtUtils>();
+
+builder.Services.AddScoped<LoginFilter>();
+
 builder.Services.AddHealthChecks();
 builder.Services.AddResponseCaching();
 

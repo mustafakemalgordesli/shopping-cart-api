@@ -8,6 +8,7 @@ using WebAPI.Data.Abstract;
 using WebAPI.DTOs;
 using WebAPI.Entities;
 using WebAPI.Services.Abstract;
+using WebAPI.Utils;
 using WebAPI.Validations;
 
 namespace WebAPI.Services.Concrete;
@@ -15,13 +16,13 @@ namespace WebAPI.Services.Concrete;
 public class AuthService : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private IConfiguration _configuration;
+    private IJwtUtils _jwtUtils;
     private IMapper _mapper;
 
-    public AuthService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper)
+    public AuthService(IUnitOfWork unitOfWork, IJwtUtils jwtUtils, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
-        _configuration = configuration;
+        _jwtUtils = jwtUtils;
         _mapper = mapper;
     }
     public async Task<AuthDTO> Login(LoginDTO request)
@@ -37,7 +38,7 @@ public class AuthService : IAuthService
                 {
                     if (VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                     {
-                        string token = CreateToken(user);
+                        string token = _jwtUtils.GenerateToken(user);
                         UserDTO userDTO = _mapper.Map<UserDTO>(user);
                         AuthDTO response = new AuthDTO(true, "auth successfull", token, userDTO);
                         return response;
@@ -86,7 +87,7 @@ public class AuthService : IAuthService
                     UserId = user.Id
                 });
                 await _unitOfWork.CommitAsync();
-                string token = CreateToken(user);
+                string token = _jwtUtils.GenerateToken(user);
                 UserDTO userDTO = _mapper.Map<UserDTO>(user);
                 AuthDTO response = new AuthDTO(true, "user registration successfully created", token, userDTO);
                 return response;
@@ -97,30 +98,6 @@ public class AuthService : IAuthService
         {
             return new AuthDTO(false, "failed to create user registration");
         }
-    }
-
-
-    private string CreateToken(User user)
-    {
-        List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.Trim()),
-            };
-
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-            _configuration.GetSection("AppSettings:Token").Value));
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-        var token = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.Now.AddDays(1),
-            signingCredentials: creds);
-
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return jwt;
     }
 
     private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

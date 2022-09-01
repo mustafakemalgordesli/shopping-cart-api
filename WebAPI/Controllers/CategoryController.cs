@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.ActionFilters;
 using WebAPI.DTOs;
 using WebAPI.Entities;
 using WebAPI.Services.Abstract;
@@ -17,7 +18,8 @@ namespace WebAPI.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpPost, Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ServiceFilter(typeof(LoginFilter))]
         public async Task<IActionResult> Add(CategoryDTO request)
         {
             ResponseDataDTO<Category> response = await _categoryService.AddAsync(request);
