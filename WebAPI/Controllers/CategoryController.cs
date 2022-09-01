@@ -20,6 +20,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(LoginFilter))]
+        [ClaimRequirementFilter(Roles = new string[] { "Admin", "SuperAdmin" })]
         public async Task<IActionResult> Add(CategoryDTO request)
         {
             ResponseDataDTO<Category> response = await _categoryService.AddAsync(request);

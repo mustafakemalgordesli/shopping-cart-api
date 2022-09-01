@@ -4,8 +4,9 @@ using WebAPI.DTOs;
 
 namespace WebAPI.ActionFilters
 {
-    public class RoleFilter : IActionFilter
+    public class ClaimRequirementFilter : Attribute, IActionFilter
     {
+        public string[] Roles;
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var req = context.HttpContext.Request;
@@ -23,6 +24,10 @@ namespace WebAPI.ActionFilters
                 return;
             }
             // Role Checking 
+            foreach (var item in Roles)
+            {
+                Console.WriteLine(item);
+            }
         }
 
         public void OnActionExecuted(ActionExecutedContext context)

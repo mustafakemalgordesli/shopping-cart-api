@@ -32,7 +32,7 @@ builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<ICipherUtils, CipherUtils>();
 
 builder.Services.AddScoped<LoginFilter>();
-builder.Services.AddScoped<JwtDecryptFilter>();
+builder.Services.AddScoped<ClaimRequirementFilter>();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddResponseCaching();
