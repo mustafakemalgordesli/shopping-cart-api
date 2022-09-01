@@ -18,12 +18,14 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private IJwtUtils _jwtUtils;
     private IMapper _mapper;
+    private ICipherUtils _cipherUtils;
 
-    public AuthService(IUnitOfWork unitOfWork, IJwtUtils jwtUtils, IMapper mapper)
+    public AuthService(IUnitOfWork unitOfWork, IJwtUtils jwtUtils, IMapper mapper, ICipherUtils cipherUtils)
     {
         _unitOfWork = unitOfWork;
         _jwtUtils = jwtUtils;
         _mapper = mapper;
+        _cipherUtils = cipherUtils;
     }
     public async Task<AuthDTO> Login(LoginDTO request)
     {
@@ -38,7 +40,7 @@ public class AuthService : IAuthService
                 {
                     if (VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                     {
-                        string token = _jwtUtils.GenerateToken(user);
+                        string token = _cipherUtils.Encrypt(_jwtUtils.GenerateToken(user));
                         UserDTO userDTO = _mapper.Map<UserDTO>(user);
                         AuthDTO response = new AuthDTO(true, "auth successfull", token, userDTO);
                         return response;
@@ -87,7 +89,7 @@ public class AuthService : IAuthService
                     UserId = user.Id
                 });
                 await _unitOfWork.CommitAsync();
-                string token = _jwtUtils.GenerateToken(user);
+                string token = _cipherUtils.Encrypt(_jwtUtils.GenerateToken(user));
                 UserDTO userDTO = _mapper.Map<UserDTO>(user);
                 AuthDTO response = new AuthDTO(true, "user registration successfully created", token, userDTO);
                 return response;

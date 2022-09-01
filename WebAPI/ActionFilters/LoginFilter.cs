@@ -8,19 +8,32 @@ using WebAPI.Utils;
 
 namespace WebAPI.ActionFilters
 {
-    public class LoginFilter : Attribute, IActionFilter
+    public class LoginFilter : IActionFilter
     {
         IJwtUtils _jwtUtils;
-        public LoginFilter(IJwtUtils jwtUtils)
+        ICipherUtils _cipherUtils;
+        public LoginFilter(IJwtUtils jwtUtils, ICipherUtils cipherUtils)
         {
             _jwtUtils = jwtUtils;
+            _cipherUtils = cipherUtils;
         }
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var req = context.HttpContext.Request;
             var res = context.HttpContext.Response;
-            string token = req.Headers.Authorization.FirstOrDefault()?.Split(' ').Last();
-            Tuple<int,string>? values = _jwtUtils.ValidateToken(token);
+            string token = req.Headers.Authorization.ToString()?.Split(" ").Last();
+
+            if (token == null)
+            {
+                context.Result = new UnauthorizedObjectResult(new ErrorDetailDTO
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "UnAuthorized"
+                });
+                return;
+            }
+            var decryptToken = _cipherUtils.Decrypt(token);
+            Tuple<int,string>? values = _jwtUtils.ValidateToken(decryptToken);
             int? id = values?.Item1;
             string? role = values?.Item2;
             if (id == null)

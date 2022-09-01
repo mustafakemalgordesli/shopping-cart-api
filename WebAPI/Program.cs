@@ -29,8 +29,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
+builder.Services.AddScoped<ICipherUtils, CipherUtils>();
 
 builder.Services.AddScoped<LoginFilter>();
+builder.Services.AddScoped<JwtDecryptFilter>();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddResponseCaching();

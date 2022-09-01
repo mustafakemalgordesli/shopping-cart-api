@@ -18,25 +18,19 @@ namespace WebAPI.Utils
 
         public string GenerateToken(User user)
         {
-            List<Claim> claims = new List<Claim>
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Token").Value);
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                new Claim("id", user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role.Trim()),
+                Subject = new ClaimsIdentity(new[] { 
+                    new Claim("id", user.Id.ToString()), 
+                    new Claim("role", user.Role.Trim()), 
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         public Tuple<int, string>? ValidateToken(string token)
@@ -60,9 +54,9 @@ namespace WebAPI.Utils
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-                string role = jwtToken.Claims.First(x => x.Type == ClaimTypes.Role).Value.ToString();
+                string role = jwtToken.Claims.First(x => x.Type == "role").Value.ToString();
 
-                // return user id from JWT token if validation successful
+                // return user id and role from JWT token if validation successful
                 return Tuple.Create(userId,role);
             }
             catch
