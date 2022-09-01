@@ -24,9 +24,14 @@ namespace WebAPI.ActionFilters
                 return;
             }
             // Role Checking 
-            foreach (var item in Roles)
+            if(Roles.FirstOrDefault(x => x == role) == null)
             {
-                Console.WriteLine(item);
+                context.Result = new UnauthorizedObjectResult(new ErrorDetailDTO
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "UnAuthorized"
+                });
+                return;
             }
         }
 
