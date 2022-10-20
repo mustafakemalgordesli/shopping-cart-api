@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.ActionFilters;
 using WebAPI.DTOs;
 using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]s")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -16,6 +17,8 @@ namespace WebAPI.Controllers
         }
         
         [HttpPost]
+        [ServiceFilter(typeof(LoginFilter))]
+        [ClaimRequirementFilter(Roles = new string[] { "Admin", "SuperAdmin" })]
         public async Task<IActionResult> Add([FromForm] ProductCreateDTO request)
         {
             ResponseDataDTO<ProductGetDTO> response = await _productService.AddAsync(request);
@@ -24,8 +27,9 @@ namespace WebAPI.Controllers
             return BadRequest(response);
         }
 
-        [ResponseCache(Duration = 10)]
+        
         [HttpGet]
+        [ResponseCache(Duration = 10)]
         public async Task<IActionResult> GetAll()
         {
             ResponseDataDTO<List<ProductGetDTO>> response = await _productService.GetAllAsync();

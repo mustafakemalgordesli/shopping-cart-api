@@ -8,7 +8,7 @@ using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Categories")]
     [ApiController]
     public class CategoryController : ControllerBase
     {

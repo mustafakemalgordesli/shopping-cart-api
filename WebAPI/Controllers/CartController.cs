@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.ActionFilters;
 using WebAPI.DTOs;
 using WebAPI.Entities;
 using WebAPI.Services.Abstract;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]s")]
     [ApiController]
     public class CartController : ControllerBase
     {
@@ -19,7 +20,8 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("/{id}")]
-        [Authorize]
+        [ServiceFilter(typeof(LoginFilter))]
+        [ClaimRequirementFilter(Roles = new string[] { "Admin", "SuperAdmin" })]
         public async Task<IActionResult> GetCartByUserId(int id)
         {
             ResponseDataDTO<Cart> result = await _cartService.GetByUserId(id);

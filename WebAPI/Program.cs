@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using WebAPI.ActionFilters;
@@ -16,7 +17,18 @@ using WebAPI.Utils;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//builder.Services.AddHealthChecks();
+
+//var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext().CreateLogger();
+
+//builder.Logging.ClearProviders();
+//builder.Logging.AddSerilog(logger);
+
+builder.Services.AddHttpLogging(httpLogging =>
+{
+    httpLogging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+});
+
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -31,11 +43,15 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddScoped<ICipherUtils, CipherUtils>();
 
+
+
 builder.Services.AddScoped<LoginFilter>();
 builder.Services.AddScoped<ClaimRequirementFilter>();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddResponseCaching();
+
+HttpLoggingConfigure.Configure(builder.Services);
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -83,6 +99,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+
+app.UseHttpLogging();
 
 app.ConfigureExceptionHandler();
 
