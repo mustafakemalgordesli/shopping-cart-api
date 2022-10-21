@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.ActionFilters;
 using WebAPI.DTOs;
 using WebAPI.Services.Abstract;
+using WebAPI.Utils;
 
 namespace WebAPI.Controllers
 {
@@ -11,9 +12,11 @@ namespace WebAPI.Controllers
     public class ProductController : ControllerBase
     {
         IProductService _productService;
-        public ProductController(IProductService productService)
+        ILoggerManager _logger;
+        public ProductController(IProductService productService, ILoggerManager logger)
         {
             _productService = productService;
+            _logger = logger;
         }
         
         [HttpPost]
@@ -32,6 +35,7 @@ namespace WebAPI.Controllers
         [ResponseCache(Duration = 10)]
         public async Task<IActionResult> GetAll()
         {
+            _logger.LogInfo("Products.GetAll() has been run");
             ResponseDataDTO<List<ProductGetDTO>> response = await _productService.GetAllAsync();
             if (response.Success)
                 return Ok(response);

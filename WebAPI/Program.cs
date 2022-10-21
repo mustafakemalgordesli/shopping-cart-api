@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Serilog;
+using NLog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using WebAPI.ActionFilters;
@@ -18,15 +18,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-//var logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).Enrich.FromLogContext().CreateLogger();
-
-//builder.Logging.ClearProviders();
-//builder.Logging.AddSerilog(logger);
+LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 builder.Services.AddHttpLogging(httpLogging =>
 {
     httpLogging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
 });
+
+builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
@@ -50,8 +49,6 @@ builder.Services.AddScoped<ClaimRequirementFilter>();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddResponseCaching();
-
-HttpLoggingConfigure.Configure(builder.Services);
 
 builder.Services.AddSwaggerGen(options =>
 {
