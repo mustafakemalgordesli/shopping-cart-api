@@ -88,7 +88,11 @@ builder.Services.AddCors(options =>
 
 
 
+
+
 var app = builder.Build();
+
+ExceptionMiddlewareExtensions.Configure(app.Services.GetRequiredService<ILoggerManager>());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

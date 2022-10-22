@@ -3,11 +3,18 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using WebAPI.DTOs;
 using WebAPI.Exceptions;
+using WebAPI.Utils;
 
 namespace WebAPI.Extensions
 {
     public static class ExceptionMiddlewareExtensions
     {
+        private static ILoggerManager _logger;
+
+        public static void Configure(ILoggerManager logger)
+        {
+            _logger = logger;
+        }
        
         public static void ConfigureExceptionHandler(this WebApplication app)
         {
@@ -21,12 +28,14 @@ namespace WebAPI.Extensions
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if(contextFeature != null)
                     {
-                        context.Response.StatusCode = contextFeature.Error switch
+                        int statusCode = contextFeature.Error switch
                         {
                             NotFoundException => StatusCodes.Status404NotFound,
                             NotAuthorizeException => StatusCodes.Status401Unauthorized,
                             _ => StatusCodes.Status500InternalServerError
                         };
+
+                        context.Response.StatusCode = statusCode;
 
                         string message = contextFeature.Error switch
                         {
@@ -35,6 +44,7 @@ namespace WebAPI.Extensions
                             _ => "Internal Server Error"
                         };
 
+                        _logger.LogError(statusCode + " " + message);
                    
 
                         await context.Response.WriteAsync(new ErrorDetailDTO
